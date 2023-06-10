@@ -26,6 +26,22 @@ public class TowerGridScript : MonoBehaviour
                 gridArray[x, y] = new TowerGridTile(x, y, towerTileGameObject);
             }
         }
+
+        // Debug
+        for (int x = 0; x < gridArray.GetLength(0); x++)
+        {
+            for (int y = 0; y < gridArray.GetLength(1); y++)
+            {
+                Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, 100f);
+                Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, 100f);
+            }
+        }
+        Debug.DrawLine(GetWorldPosition(0, gridHeight), GetWorldPosition(gridWidth, gridHeight), Color.white, 100f);
+        Debug.DrawLine(GetWorldPosition(gridWidth, 0), GetWorldPosition(gridWidth, gridHeight), Color.white, 100f);
+    }
+
+    private Vector3 GetWorldPosition(int x, int y)
+    {
+        return new Vector3(x, y) * cellSize;
     }
 }
-
