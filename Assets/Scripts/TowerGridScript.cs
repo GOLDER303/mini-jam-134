@@ -59,8 +59,9 @@ public class TowerGridScript : MonoBehaviour
 
         TowerSO newTowerSO = towerSOs[Random.Range(0, towerSOs.Count - 1)];
 
-        gridArray[towerXPos, towerYPos].GetTowerTileGameObject().GetComponent<SpriteRenderer>().sprite = newTowerSO.statesSprites[newTowerSO.currentState];
+        gridArray[towerXPos, towerYPos].GetTowerTileGameObject().GetComponent<SpriteRenderer>().sprite = newTowerSO.statesSprites[0];
 
+        gridArray[towerXPos, towerYPos].SetTowerSO(newTowerSO);
         gridArray[towerXPos, towerYPos].SetIsOccupied(true);
     }
 
@@ -86,6 +87,22 @@ public class TowerGridScript : MonoBehaviour
 
             MoveTower(startDrag, endDrag);
         }
+    }
+
+    private bool UpgradeTower(Vector2Int towerPosition)
+    {
+        TowerGridTile towerToUpgrade = gridArray[towerPosition.x, towerPosition.y];
+        TowerSO towerToUpgradeSO = towerToUpgrade.GetTowerSO();
+        int newTowerToUpgradeState = towerToUpgrade.Upgrade();
+
+        if (newTowerToUpgradeState == -1)
+        {
+            return false;
+        }
+
+        towerToUpgrade.GetTowerTileGameObject().GetComponent<SpriteRenderer>().sprite = towerToUpgradeSO.statesSprites[newTowerToUpgradeState];
+
+        return true;
     }
 
     private void MoveTower(Vector2Int startDrag, Vector2Int endDrag)
