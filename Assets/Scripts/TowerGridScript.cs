@@ -6,6 +6,7 @@ public class TowerGridScript : MonoBehaviour
 {
     [SerializeField] private GameObject emptyTowerGridTilePrefab;
     [SerializeField] private List<TowerSO> towerSOs;
+    private Vector3 gridOriginPosition = new Vector3(-7.5f, -6f, 0);
 
     private int gridWidth = 5;
     private int gridHeight = 4;
@@ -26,7 +27,7 @@ public class TowerGridScript : MonoBehaviour
         {
             for (int y = 0; y < gridArray.GetLength(1); y++)
             {
-                GameObject towerTileGameObject = Instantiate(emptyTowerGridTilePrefab, new Vector3(x * cellSize + cellSize / 2, y * cellSize + cellSize / 2), Quaternion.identity);
+                GameObject towerTileGameObject = Instantiate(emptyTowerGridTilePrefab, GetWorldPosition(x, y) + new Vector3(cellSize / 2, cellSize / 2), Quaternion.identity);
                 gridArray[x, y] = new TowerGridTile(x, y, towerTileGameObject);
             }
         }
@@ -140,13 +141,13 @@ public class TowerGridScript : MonoBehaviour
 
     private Vector3 GetWorldPosition(int x, int y)
     {
-        return new Vector3(x, y) * cellSize;
+        return new Vector3(x, y) * cellSize + gridOriginPosition;
     }
 
     private Vector2Int GetTileFromWorldPosition(Vector3 worldPosition)
     {
-        int x = Mathf.FloorToInt((worldPosition).x / cellSize);
-        int y = Mathf.FloorToInt((worldPosition).y / cellSize);
+        int x = Mathf.FloorToInt((worldPosition - gridOriginPosition).x / cellSize);
+        int y = Mathf.FloorToInt((worldPosition - gridOriginPosition).y / cellSize);
 
         return new Vector2Int(x, y);
     }
