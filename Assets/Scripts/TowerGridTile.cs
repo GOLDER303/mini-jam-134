@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,16 +8,19 @@ public class TowerGridTile
     private int xPos;
     private int yPos;
     private GameObject towerTileGameObject;
-    private bool isOccupied = false;
     private TowerSO towerSO;
     private int currentState;
     private int numberOfStates;
 
-    public TowerGridTile(int xPos, int yPos, GameObject towerTileGameObject)
+    public TowerGridTile(int xPos, int yPos, GameObject towerTileGameObject, TowerSO towerSO)
     {
         this.xPos = xPos;
         this.yPos = yPos;
         this.towerTileGameObject = towerTileGameObject;
+        this.towerSO = towerSO;
+        currentState = 0;
+        numberOfStates = towerSO.statesSprites.Count;
+        towerTileGameObject.GetComponent<SpriteRenderer>().sprite = towerSO.statesSprites[currentState];
     }
 
     public GameObject GetTowerTileGameObject()
@@ -24,24 +28,16 @@ public class TowerGridTile
         return towerTileGameObject;
     }
 
-    public bool IsOccupied()
-    {
-        return isOccupied;
-    }
-
-    public void SetIsOccupied(bool isOccupied)
-    {
-        this.isOccupied = isOccupied;
-    }
-
-    public int Upgrade()
+    public bool Upgrade()
     {
         if (currentState >= numberOfStates - 1)
         {
-            return -1;
+            return false;
         }
 
-        return ++currentState;
+        towerTileGameObject.GetComponent<SpriteRenderer>().sprite = towerSO.statesSprites[++currentState];
+
+        return true;
     }
 
     public int GetCurrentState()
@@ -49,19 +45,13 @@ public class TowerGridTile
         return currentState;
     }
 
-    public int GetNumberOfStates()
+    public bool CanBeUpgraded()
     {
-        return numberOfStates;
+        return currentState < numberOfStates - 1;
     }
 
-    public void SetTowerSO(TowerSO towerSO)
+    public TowerTypeEnum GetTowerType()
     {
-        this.towerSO = towerSO;
-        this.numberOfStates = towerSO.statesSprites.Count;
-    }
-
-    public TowerSO GetTowerSO()
-    {
-        return towerSO;
+        return towerSO.towerType;
     }
 }

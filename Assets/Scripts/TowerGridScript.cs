@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class TowerGridScript : MonoBehaviour
 {
-    [SerializeField] private GameObject emptyTowerGridTilePrefab;
+    [SerializeField] private GameObject emptyGridTilePrefab;
+    [SerializeField] private GameObject towerPrefab;
     [SerializeField] private List<TowerSO> towerSOs;
     private Vector3 gridOriginPosition = new Vector3(-7.5f, -6f, 0);
 
@@ -27,8 +28,7 @@ public class TowerGridScript : MonoBehaviour
         {
             for (int y = 0; y < gridArray.GetLength(1); y++)
             {
-                GameObject towerTileGameObject = Instantiate(emptyTowerGridTilePrefab, GetWorldPosition(x, y) + new Vector3(cellSize / 2, cellSize / 2), Quaternion.identity);
-                gridArray[x, y] = new TowerGridTile(x, y, towerTileGameObject);
+                Instantiate(emptyGridTilePrefab, GetWorldPosition(x, y) + new Vector3(cellSize / 2, cellSize / 2, .1f), Quaternion.identity);
             }
         }
 
@@ -52,7 +52,7 @@ public class TowerGridScript : MonoBehaviour
         int towerXPos = Random.Range(0, gridArray.GetLength(0) - 1);
         int towerYPos = Random.Range(0, gridArray.GetLength(1) - 1);
 
-        while (gridArray[towerXPos, towerYPos].IsOccupied())
+        while (gridArray[towerXPos, towerYPos] != null)
         {
             towerXPos = Random.Range(0, gridArray.GetLength(0) - 1);
             towerYPos = Random.Range(0, gridArray.GetLength(1) - 1);
@@ -60,10 +60,9 @@ public class TowerGridScript : MonoBehaviour
 
         TowerSO newTowerSO = towerSOs[Random.Range(0, towerSOs.Count - 1)];
 
-        gridArray[towerXPos, towerYPos].GetTowerTileGameObject().GetComponent<SpriteRenderer>().sprite = newTowerSO.statesSprites[0];
+        GameObject towerGameObject = Instantiate(towerPrefab, GetWorldPosition(towerXPos, towerYPos) + new Vector3(cellSize / 2, cellSize / 2), Quaternion.identity);
 
-        gridArray[towerXPos, towerYPos].SetTowerSO(newTowerSO);
-        gridArray[towerXPos, towerYPos].SetIsOccupied(true);
+        gridArray[towerXPos, towerYPos] = new TowerGridTile(towerXPos, towerYPos, towerGameObject, newTowerSO);
     }
 
     void Update()
@@ -93,32 +92,42 @@ public class TowerGridScript : MonoBehaviour
     private bool UpgradeTower(Vector2Int towerPosition)
     {
         TowerGridTile towerToUpgrade = gridArray[towerPosition.x, towerPosition.y];
-        TowerSO towerToUpgradeSO = towerToUpgrade.GetTowerSO();
-        int newTowerToUpgradeState = towerToUpgrade.Upgrade();
-
-        if (newTowerToUpgradeState == -1)
-        {
-            return false;
-        }
-
-        towerToUpgrade.GetTowerTileGameObject().GetComponent<SpriteRenderer>().sprite = towerToUpgradeSO.statesSprites[newTowerToUpgradeState];
-
-        return true;
+        return towerToUpgrade.Upgrade();
     }
 
     private void MoveTower(Vector2Int startDrag, Vector2Int endDrag)
     {
         if (!IsValidTilePosition(startDrag) || !IsValidTilePosition(endDrag))
-        {
             return;
-        }
 
         TowerGridTile movedTile = gridArray[startDrag.x, startDrag.y];
         TowerGridTile destinationTile = gridArray[endDrag.x, endDrag.y];
 
-        Sprite destinationTileSprite = destinationTile.GetTowerTileGameObject().GetComponent<SpriteRenderer>().sprite;
-        destinationTile.GetTowerTileGameObject().GetComponent<SpriteRenderer>().sprite = movedTile.GetTowerTileGameObject().GetComponent<SpriteRenderer>().sprite;
-        movedTile.GetTowerTileGameObject().GetComponent<SpriteRenderer>().sprite = destinationTileSprite;
+        if (movedTile == null && destinationTile == null)
+            return;
+
+
+        if (movedTile != null
+            && destinationTile != null
+            && movedTile.GetTowerType() == destinationTile.GetTowerType()
+            && movedTile.GetCurrentState() == destinationTile.GetCurrentState()
+            && destinationTile.CanBeUpgraded())
+        {
+            Destroy(movedTile.GetTowerTileGameObject());
+            gridArray[startDrag.x, startDrag.y] = null;
+            destinationTile.Upgrade();
+        }
+        else
+        {
+            if (destinationTile == null)
+            {
+                Vector3 movedTilePosition = movedTile.GetTowerTileGameObject().transform.position;
+                movedTile.GetTowerTileGameObject().transform.position = GetWorldPosition(endDrag) + new Vector3(cellSize / 2, cellSize / 2);
+
+                gridArray[startDrag.x, startDrag.y] = null;
+                gridArray[endDrag.x, endDrag.y] = movedTile;
+            }
+        }
     }
 
     private bool IsValidTilePosition(Vector2Int position)
@@ -142,6 +151,11 @@ public class TowerGridScript : MonoBehaviour
     private Vector3 GetWorldPosition(int x, int y)
     {
         return new Vector3(x, y) * cellSize + gridOriginPosition;
+    }
+
+    private Vector3 GetWorldPosition(Vector2Int position)
+    {
+        return new Vector3(position.x, position.y) * cellSize + gridOriginPosition;
     }
 
     private Vector2Int GetTileFromWorldPosition(Vector3 worldPosition)
