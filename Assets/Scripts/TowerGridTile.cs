@@ -36,7 +36,7 @@ public class TowerGridTile
 
     public int Upgrade()
     {
-        if (currentState >= numberOfStates)
+        if (currentState >= numberOfStates - 1)
         {
             return -1;
         }
