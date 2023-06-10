@@ -7,6 +7,7 @@ public class TowerGridTile
     private int xPos;
     private int yPos;
     private GameObject towerTileGameObject;
+    private bool isOccupied = false;
 
     public TowerGridTile(int xPos, int yPos, GameObject towerTileGameObject)
     {
@@ -20,4 +21,13 @@ public class TowerGridTile
         return towerTileGameObject;
     }
 
+    public bool IsOccupied()
+    {
+        return isOccupied;
+    }
+
+    public void SetIsOccupied(bool isOccupied)
+    {
+        this.isOccupied = isOccupied;
+    }
 }

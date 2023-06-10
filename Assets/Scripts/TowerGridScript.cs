@@ -5,6 +5,7 @@ using UnityEngine;
 public class TowerGridScript : MonoBehaviour
 {
     [SerializeField] private GameObject emptyTowerGridTilePrefab;
+    [SerializeField] private List<TowerSO> towerSOs;
 
     private int gridWidth = 5;
     private int gridHeight = 4;
@@ -38,6 +39,26 @@ public class TowerGridScript : MonoBehaviour
         }
         Debug.DrawLine(GetWorldPosition(0, gridHeight), GetWorldPosition(gridWidth, gridHeight), Color.white, 100f);
         Debug.DrawLine(GetWorldPosition(gridWidth, 0), GetWorldPosition(gridWidth, gridHeight), Color.white, 100f);
+
+        SpawnRandomTower();
+    }
+
+    private void SpawnRandomTower()
+    {
+        int towerXPos = Random.Range(0, gridArray.GetLength(0) - 1);
+        int towerYPos = Random.Range(0, gridArray.GetLength(1) - 1);
+
+        while (gridArray[towerXPos, towerYPos].IsOccupied())
+        {
+            towerXPos = Random.Range(0, gridArray.GetLength(0) - 1);
+            towerYPos = Random.Range(0, gridArray.GetLength(1) - 1);
+        }
+
+        TowerSO newTowerSO = towerSOs[Random.Range(0, towerSOs.Count - 1)];
+
+        gridArray[towerXPos, towerYPos].GetTowerTileGameObject().GetComponent<SpriteRenderer>().sprite = newTowerSO.statesSprites[newTowerSO.currentState];
+
+        gridArray[towerXPos, towerYPos].SetIsOccupied(true);
     }
 
     private Vector3 GetWorldPosition(int x, int y)
