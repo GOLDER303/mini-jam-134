@@ -12,14 +12,14 @@ public class TowerGridScript : MonoBehaviour
     private int gridWidth = 5;
     private int gridHeight = 4;
     private float cellSize = 3f;
-    private TowerGridTile[,] gridArray;
+    private GameObject[,] gridArray;
 
     private Vector2Int startDrag = new Vector2Int(-1, -1);
     private Vector2Int endDrag = new Vector2Int(-1, -1);
 
     public TowerGridScript()
     {
-        this.gridArray = new TowerGridTile[gridWidth, gridHeight];
+        this.gridArray = new GameObject[gridWidth, gridHeight];
     }
 
     void Start()
@@ -64,7 +64,9 @@ public class TowerGridScript : MonoBehaviour
 
         GameObject towerGameObject = Instantiate(towerPrefab, GetWorldPosition(towerXPos, towerYPos) + new Vector3(cellSize / 2, cellSize / 2), Quaternion.identity);
 
-        gridArray[towerXPos, towerYPos] = new TowerGridTile(towerXPos, towerYPos, towerGameObject, newTowerSO);
+        towerGameObject.GetComponent<TowerManager>().SetData(newTowerSO);
+
+        gridArray[towerXPos, towerYPos] = towerGameObject;
     }
 
     void Update()
@@ -93,8 +95,8 @@ public class TowerGridScript : MonoBehaviour
 
     private bool UpgradeTower(Vector2Int towerPosition)
     {
-        TowerGridTile towerToUpgrade = gridArray[towerPosition.x, towerPosition.y];
-        return towerToUpgrade.Upgrade();
+        GameObject towerToUpgrade = gridArray[towerPosition.x, towerPosition.y];
+        return towerToUpgrade.GetComponent<TowerManager>().Upgrade();
     }
 
     private void MoveTower(Vector2Int startDrag, Vector2Int endDrag)
@@ -102,33 +104,53 @@ public class TowerGridScript : MonoBehaviour
         if (!IsValidTilePosition(startDrag) || !IsValidTilePosition(endDrag))
             return;
 
-        TowerGridTile movedTile = gridArray[startDrag.x, startDrag.y];
-        TowerGridTile destinationTile = gridArray[endDrag.x, endDrag.y];
+        GameObject movedTower = gridArray[startDrag.x, startDrag.y];
+        GameObject destinationTile = gridArray[endDrag.x, endDrag.y];
 
-        if (movedTile == null && destinationTile == null)
+        if (movedTower == null)
             return;
 
 
-        if (movedTile != null
-            && destinationTile != null
-            && movedTile.GetTowerType() == destinationTile.GetTowerType()
-            && movedTile.GetCurrentState() == destinationTile.GetCurrentState()
-            && destinationTile.CanBeUpgraded())
+        if (destinationTile != null)
         {
-            Destroy(movedTile.GetTowerTileGameObject());
-            gridArray[startDrag.x, startDrag.y] = null;
-            destinationTile.Upgrade();
+            TowerManager movedTowerManagementComponent = movedTower.GetComponent<TowerManager>();
+            TowerManager destinationTowerManagementComponent = destinationTile.GetComponent<TowerManager>();
+
+            if (movedTowerManagementComponent.GetTowerType() == destinationTowerManagementComponent.GetTowerType()
+                && movedTowerManagementComponent.GetCurrentState() == destinationTowerManagementComponent.GetCurrentState()
+                && destinationTowerManagementComponent.CanBeUpgraded())
+            {
+                Destroy(movedTower);
+                gridArray[startDrag.x, startDrag.y] = null;
+                destinationTowerManagementComponent.Upgrade();
+            }
+            else
+            {
+                ChangeTowerPosition(startDrag, endDrag);
+            }
         }
         else
         {
-            if (destinationTile == null)
-            {
-                Vector3 movedTilePosition = movedTile.GetTowerTileGameObject().transform.position;
-                movedTile.GetTowerTileGameObject().transform.position = GetWorldPosition(endDrag) + new Vector3(cellSize / 2, cellSize / 2);
+            ChangeTowerPosition(startDrag, endDrag);
+        }
+    }
 
-                gridArray[startDrag.x, startDrag.y] = null;
-                gridArray[endDrag.x, endDrag.y] = movedTile;
-            }
+    private void ChangeTowerPosition(Vector2Int firstTowerPosition, Vector2Int secondTowerPosition)
+    {
+        GameObject firstTower = gridArray[firstTowerPosition.x, firstTowerPosition.y];
+        GameObject secondTower = gridArray[secondTowerPosition.x, secondTowerPosition.y];
+
+        firstTower.transform.position = GetWordPositionOfCellCenter(secondTowerPosition);
+        gridArray[secondTowerPosition.x, secondTowerPosition.y] = firstTower;
+
+        if (secondTower != null)
+        {
+            secondTower.transform.position = GetWordPositionOfCellCenter(firstTowerPosition);
+            gridArray[firstTowerPosition.x, firstTowerPosition.y] = secondTower;
+        }
+        else
+        {
+            gridArray[firstTowerPosition.x, firstTowerPosition.y] = null;
         }
     }
 

@@ -1,31 +1,31 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class TowerGridTile
+public class TowerManager : MonoBehaviour
 {
-    private int xPos;
-    private int yPos;
-    private GameObject towerTileGameObject;
+    private SpriteRenderer spriteRenderer;
     private TowerSO towerSO;
+
     private int currentState;
     private int numberOfStates;
 
-    public TowerGridTile(int xPos, int yPos, GameObject towerTileGameObject, TowerSO towerSO)
+    private void Awake()
     {
-        this.xPos = xPos;
-        this.yPos = yPos;
-        this.towerTileGameObject = towerTileGameObject;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    public void SetData(TowerSO towerSO)
+    {
         this.towerSO = towerSO;
         currentState = 0;
         numberOfStates = towerSO.statesSprites.Count;
-        towerTileGameObject.GetComponent<SpriteRenderer>().sprite = towerSO.statesSprites[currentState];
+        spriteRenderer.sprite = towerSO.statesSprites[currentState];
     }
 
     public GameObject GetTowerTileGameObject()
     {
-        return towerTileGameObject;
+        return gameObject;
     }
 
     public bool Upgrade()
@@ -35,7 +35,7 @@ public class TowerGridTile
             return false;
         }
 
-        towerTileGameObject.GetComponent<SpriteRenderer>().sprite = towerSO.statesSprites[++currentState];
+        spriteRenderer.sprite = towerSO.statesSprites[++currentState];
 
         return true;
     }
