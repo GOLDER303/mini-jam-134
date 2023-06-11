@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf4a7bd93baf27c459d0e1c466dbce5e, type: 3}
   m_Name: FirstTowerSO
   m_EditorClassIdentifier: 
-  numberOfStatues: 0
-  currentState: 0
+  towerType: 1
   statesSprites:
   - {fileID: 21300000, guid: aca9b362b4092ec4abc00b0619fdd8e0, type: 3}
+  - {fileID: 21300000, guid: e38e24e061a3be745b34015114f0ad03, type: 3}
