@@ -24,11 +24,13 @@ public class TowerGridScript : MonoBehaviour
 
     void Start()
     {
+        GameObject gridTilesEmpty = new GameObject("GridTiles");
+
         for (int x = 0; x < gridArray.GetLength(0); x++)
         {
             for (int y = 0; y < gridArray.GetLength(1); y++)
             {
-                Instantiate(emptyGridTilePrefab, GetWorldPosition(x, y) + new Vector3(cellSize / 2, cellSize / 2, .1f), Quaternion.identity);
+                Instantiate(emptyGridTilePrefab, GetWorldPosition(x, y) + new Vector3(cellSize / 2, cellSize / 2, .1f), Quaternion.identity, gridTilesEmpty.transform);
             }
         }
 
