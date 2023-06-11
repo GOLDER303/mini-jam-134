@@ -148,6 +148,11 @@ public class TowerGridScript : MonoBehaviour
         return mouseWorldPosition;
     }
 
+    private Vector3 GetWordPositionOfCellCenter(Vector2Int position)
+    {
+        return (new Vector3(position.x, position.y) * cellSize + gridOriginPosition) + new Vector3(cellSize / 2, cellSize / 2);
+    }
+
     private Vector3 GetWorldPosition(int x, int y)
     {
         return new Vector3(x, y) * cellSize + gridOriginPosition;
