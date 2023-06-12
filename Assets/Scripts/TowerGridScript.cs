@@ -7,11 +7,11 @@ public class TowerGridScript : MonoBehaviour
     [SerializeField] private GameObject emptyGridTilePrefab;
     [SerializeField] private GameObject towerPrefab;
     [SerializeField] private List<TowerSO> towerSOs;
-    private Vector3 gridOriginPosition = new Vector3(-7.5f, -6f, 0);
+    private Vector3 gridOriginPosition = new Vector3(-10.5f, -2.5f, 0);
 
-    private int gridWidth = 5;
-    private int gridHeight = 4;
-    private float cellSize = 3f;
+    private int gridWidth = 8;
+    private int gridHeight = 3;
+    private float cellSize = 2.1f;
     private GameObject[,] gridArray;
 
     private Vector2Int startDrag = new Vector2Int(-1, -1);
