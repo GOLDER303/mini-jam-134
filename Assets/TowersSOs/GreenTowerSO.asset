@@ -10,9 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf4a7bd93baf27c459d0e1c466dbce5e, type: 3}
-  m_Name: FirstTowerSO
+  m_Name: GreenTowerSO
   m_EditorClassIdentifier: 
   towerType: 1
   statesSprites:
-  - {fileID: 21300000, guid: aca9b362b4092ec4abc00b0619fdd8e0, type: 3}
-  - {fileID: 21300000, guid: e38e24e061a3be745b34015114f0ad03, type: 3}
+  - {fileID: 21300000, guid: 2d55cf73c9cda554a8a82fa7ee0eb54e, type: 3}
+  - {fileID: 21300000, guid: cd8f9499ff414da479b2606d89bca8f6, type: 3}
+  statesDamage:
+  - 50
+  - 75
+  statesRange:
+  - 4
+  - 5
